@@ -1,0 +1,2 @@
+enter all packages line by line e.g. cpp-4.8.5-44.el7
+
