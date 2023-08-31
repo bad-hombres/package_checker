@@ -1,4 +1,5 @@
 import subprocess
+import shutil
 import os
 
 def main():
@@ -10,7 +11,10 @@ def main():
     with open(package_list_file, 'r', encoding='utf-8') as f:
         package_names = [line.strip() for line in f]
 
-    # Create the download directory if it doesn't exist
+    # check if the download directory exist and if it is delete it. then create new directory. this is so we get rid of old packages
+    if os.path.exists(download_directory):
+        shutil.rmtree(download_directory)
+
     os.makedirs(download_directory, exist_ok=True)
 
     try:
