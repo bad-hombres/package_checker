@@ -1,10 +1,11 @@
 From centos:7
 
-#copy require files over
-COPY rpm_download.py /root/rpm_download.py
-COPY input.txt /root/input.txt
-
 WORKDIR /root
-#update image
+
+#update image and isntall python3
 RUN yum -y update && yum install -y python3
 
+#run the download script
+#RUN python3 /root/rpm_download.py
+
+ENTRYPOINT ["python3", "./rpm_download.py"]
