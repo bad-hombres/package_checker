@@ -28,7 +28,7 @@ r_option=""
 
 
 # Parse command-line options
-while getopts "r:d:" opt; do
+while getopts "r:u:" opt; do
   case $opt in
     r)
       case "$OPTARG" in
@@ -41,7 +41,7 @@ while getopts "r:d:" opt; do
           ;;
       esac
       ;;
-    d)
+    u)
       user_input="$OPTARG"
       ;;
     *)
@@ -69,7 +69,6 @@ fi
 # If user input was provided, use it in the code
 if [ -n "$user_input" ]; then
   echo "User input: $user_input"
-  # Replace this with the code that uses the user input
 fi
 
 # Perform the action based on the -r option
@@ -82,8 +81,14 @@ case "$r_option" in
       docker build -t rpm_module_r7:$script_version -f $CURRENT_DIR/Dockerfile_r7 $CURRENT_DIR
     fi
       echo "docker image exist"
-      # Run the Docker and mount local directory onto the container
-      docker run -v $PWD:/root -it --rm rpm_module_r7:$script_version
+      #Run the Docker and mount local directory onto the container
+      #If user input was provided, use it in the code---------------------------------------------------------update------------------------------------------------------------
+      if [ -n "$user_input" ]; then
+        echo "User input: $user_input"
+        docker run -v $PWD:/root -it --rm rpm_module_r7:$script_version
+
+      fi
+        docker run -v $PWD:/root -it --rm rpm_module_r7:$script_version
   
 
     # Replace this with the actual action you want to perform for option -r 7
