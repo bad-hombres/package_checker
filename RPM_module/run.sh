@@ -21,8 +21,8 @@ usage() {
   exit 1
 }
 
-# Variables to store user input and flag to track whether a flag was provided
-user_input=""
+# Variables to store user input via flag. this will be used to install new repo
+new_repo_input=""
 #flag_provided=false
 r_option=""
 
@@ -42,7 +42,7 @@ while getopts "r:u:" opt; do
       esac
       ;;
     u)
-      user_input="$OPTARG"
+      new_repo_input="$OPTARG"
       ;;
     *)
       usage
@@ -66,11 +66,6 @@ fi
 #  usage
 #fi
 
-# If user input was provided, use it in the code
-if [ -n "$user_input" ]; then
-  echo "User input: $user_input"
-fi
-
 # Perform the action based on the -r option
 case "$r_option" in
   
@@ -82,11 +77,11 @@ case "$r_option" in
     fi
       echo "docker image exist"
       #Run the Docker and mount local directory onto the container
-      #If user input was provided, use it in the code---------------------------------------------------------update------------------------------------------------------------
-      if [ -n "$user_input" ]; then
-        echo "User input: $user_input"
-        docker run -v $PWD:/root -it --rm rpm_module_r7:$script_version
 
+      #If new repo flag was provided, use it in the code---------------------------------------------------------update------------------------------------------------------------
+      if [ -n "$new_repo_input" ]; then
+        echo "User input: $new_repo_input"
+      	docker exec -it rpm_module_r7:$script_version /root/add_repo.sh -url $new_repo_input
       fi
         docker run -v $PWD:/root -it --rm rpm_module_r7:$script_version
   
@@ -102,7 +97,11 @@ case "$r_option" in
     fi
       echo "docker image exist"
       # Run the Docker and mount local directory onto the container
-      docker run -v $PWD:/root -it --rm rpm_module_r8:$script_version
+      #If new repo flag was provided, use it in the code---------------------------------------------------------update------------------------------------------------------------
+      if [ -n "$new_repo_input" ]; then
+        echo "User input: $new_repo_input"
+      fi
+	docker run -v $PWD:/root -it --rm rpm_module_r8:$script_version
     ;;
   
   9)
@@ -114,7 +113,11 @@ case "$r_option" in
     fi
       echo "docker image exist"
       # Run the Docker and mount local directory onto the container
-      docker run -v $PWD:/root -it --rm rpm_module_r9:$script_version
+      #If new repo flag was provided, use it in the code---------------------------------------------------------update------------------------------------------------------------
+      if [ -n "$new_repo_input" ]; then
+        echo "User input: $new_repo_input"
+      fi
+      	docker run -v $PWD:/root -it --rm rpm_module_r9:$script_version
     ;;
 
   *)
