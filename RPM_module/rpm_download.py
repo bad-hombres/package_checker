@@ -35,11 +35,6 @@ def main():
 
         print("Packages downloaded successfully to:", download_directory)
 
-        # Scan for vulnerabilities in downloaded packages
-        vulnerabilities_log = "vulnerabilities_log.log"
-        scan_for_vulnerabilities(download_directory, vulnerabilities_log)
-        print("Vulnerability scan completed. Check vulnerabilities_log.log for results.")
-
     except subprocess.CalledProcessError as e:
         print("Error executing command:")
         print(e)
@@ -57,22 +52,6 @@ def download_package(package_name, download_directory):
     else:
         error_message = stderr.decode('utf-8').strip() if stderr else "Unknown error"
         return False, f"Download failed for '{package_name}': {error_message}"
-
-def scan_for_vulnerabilities(directory, vulnerabilities_log):
-    with open(vulnerabilities_log, 'w', encoding='utf-8') as log:
-        for filename in os.listdir(directory):
-            if filename.endswith('.rpm'):
-                vulnerabilities = scan_package_vulnerabilities(os.path.join(directory, filename))
-                log.write(f"Package: {filename}\n")
-                log.write(f"Vulnerabilities:\n{vulnerabilities}\n\n")
-
-def scan_package_vulnerabilities(rpm_file_path):
-    try:
-        changelog_output = subprocess.check_output(["rpm", "-q", "--changelog", "-p", rpm_file_path], stderr=subprocess.PIPE)
-        changelog_output = changelog_output.decode('utf-8')  # Decode the output to a string
-        return changelog_output
-    except subprocess.CalledProcessError as e:
-        return "Error retrieving changelog: " + e.stderr.decode('utf-8')
 
 if __name__ == "__main__":
     main()

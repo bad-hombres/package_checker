@@ -10,6 +10,12 @@ if ! [ -x "$(command -v docker)" ]; then
   exit 1
 fi
 
+#getting grype
+if ! [ -x "$(command -v grype)" ]; then
+  echo "Grype is not installed. Password is required to install grype..."
+  sudo curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sudo sh -s -- -b /usr/local/bin
+fi
+
 # Get the absolute path of the current directory
 CURRENT_DIR=$(pwd)
 
@@ -23,9 +29,8 @@ usage() {
 
 # Variables to store user input via flag. this will be used to install new repo
 new_repo_input=""
-#flag_provided=false
+flag_provided=false
 r_option=""
-
 
 # Parse command-line options
 while getopts "r:u:" opt; do
@@ -57,14 +62,7 @@ if [ -z "$r_option" ]; then
 fi
 
 # Shift to the next argument after the options
-#shift $((OPTIND-1))
-
-  
-
-# If there are any additional arguments
-#if [ $# -ne 0 ]; then
-#  usage
-#fi
+shift $((OPTIND-1))
 
 # Perform the action based on the -r option
 case "$r_option" in
@@ -78,15 +76,13 @@ case "$r_option" in
       echo "docker image exist"
       #Run the Docker and mount local directory onto the container
 
-      #If new repo flag was provided, use it in the code---------------------------------------------------------update------------------------------------------------------------
+      #If new repo flag was provided, use it in the code
       if [ -n "$new_repo_input" ]; then
         echo "User input: $new_repo_input"
       	docker exec -it rpm_module_r7:$script_version /root/add_repo.sh -url $new_repo_input
       fi
         docker run -v $PWD:/root -it --rm rpm_module_r7:$script_version
-  
-
-    # Replace this with the actual action you want to perform for option -r 7
+    grype dir:./packages-download --distro rhel:7 -o table > vulnerablity_scan.log
     ;;
   
   8)
@@ -97,11 +93,14 @@ case "$r_option" in
     fi
       echo "docker image exist"
       # Run the Docker and mount local directory onto the container
-      #If new repo flag was provided, use it in the code---------------------------------------------------------update------------------------------------------------------------
+      #If new repo flag was provided, use it in the code
       if [ -n "$new_repo_input" ]; then
         echo "User input: $new_repo_input"
+      	docker exec -it rpm_module_r8:$script_version /root/add_repo.sh -url $new_repo_input
+
       fi
 	docker run -v $PWD:/root -it --rm rpm_module_r8:$script_version
+    grype dir:./packages-download --distro rhel:8 -o table > vulnerablity_scan.log
     ;;
   
   9)
@@ -113,11 +112,13 @@ case "$r_option" in
     fi
       echo "docker image exist"
       # Run the Docker and mount local directory onto the container
-      #If new repo flag was provided, use it in the code---------------------------------------------------------update------------------------------------------------------------
+      #If new repo flag was provided, use it in the code
       if [ -n "$new_repo_input" ]; then
         echo "User input: $new_repo_input"
+      	docker exec -it rpm_module_r9:$script_version /root/add_repo.sh -url $new_repo_input
       fi
       	docker run -v $PWD:/root -it --rm rpm_module_r9:$script_version
+    grype dir:./packages-download --distro rhel:9 -o table > vulnerablity_scan.log
     ;;
 
   *)
