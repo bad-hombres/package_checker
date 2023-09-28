@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #script version, update each time you release change to dockerfile
-script_version="0.1"
+script_version="0.2"
 
 
 # Check if Docker is installed
@@ -69,59 +69,57 @@ case "$r_option" in
   
   7)
     echo "Performing action R7"
-    # Check if the 'rpm_module_r7:[version]' image exists and buid it if it does not
-    if ! docker image inspect rpm_module_r7:$script_version > /dev/null 2>&1; then
-      docker build -t rpm_module_r7:$script_version -f $CURRENT_DIR/Dockerfile_r7 $CURRENT_DIR
-    fi
-      echo "docker image exist"
-      #Run the Docker and mount local directory onto the container
-
-      #If new repo flag was provided, use it in the code
-      if [ -n "$new_repo_input" ]; then
-        echo "User input: $new_repo_input"
-      	docker exec -it rpm_module_r7:$script_version /root/add_repo.sh -url $new_repo_input
+    #check if custom repo flag was provided
+    if [ -n "$new_repo_input" ]; then
+       echo "CUSTOM REPO INSTALLED: $new_repo_input"
+       docker build -t rpm_module_r7:$script_version --build-arg OS_VERSION="centos:7" --build-arg ARG_REPO=$new_repo_input $CURRENT_DIR
+    else
+      # Check if the 'rpm_module_r7:[version]' image exists and buid it if it does not
+      if ! docker image inspect rpm_module_r7:$script_version > /dev/null 2>&1; then
+        docker build -t rpm_module_r7:$script_version --build-arg OS_VERSION="centos:7" $CURRENT_DIR
       fi
-        docker run -v $PWD:/root -it --rm rpm_module_r7:$script_version
+    fi
+    # Run the Docker and mount local directory onto the container
+    docker run -v $PWD:/root -it --rm rpm_module_r7:$script_version
+    
     grype dir:./packages-download --distro rhel:7 -o table > vulnerablity_scan.log
     ;;
   
   8)
     echo "Performing action R8"
-    # Check if the 'rpm_module_r8:[version]' image exists and buid it if it does not
-    if ! docker image inspect rpm_module_r8:$script_version > /dev/null 2>&1; then
-      docker build -t rpm_module_r8:$script_version -f $CURRENT_DIR/Dockerfile_r8 $CURRENT_DIR
-    fi
-      echo "docker image exist"
-      # Run the Docker and mount local directory onto the container
-      #If new repo flag was provided, use it in the code
-      if [ -n "$new_repo_input" ]; then
-        echo "User input: $new_repo_input"
-      	docker exec -it rpm_module_r8:$script_version /root/add_repo.sh -url $new_repo_input
-
+    #check if custom repo flag was provided
+    if [ -n "$new_repo_input" ]; then
+       echo "CUSTOM REPO INSTALLED: $new_repo_input"
+       docker build -t rpm_module_r8:$script_version --build-arg OS_VERSION="registry.access.redhat.com/ubi8/ubi:latest" --build-arg ARG_REPO=$new_repo_input $CURRENT_DIR
+    else
+      # Check if the 'rpm_module_r8:[version]' image exists and buid it if it does not
+      if ! docker image inspect rpm_module_r8:$script_version > /dev/null 2>&1; then
+        docker build -t rpm_module_r8:$script_version --build-arg OS_VERSION="registry.access.redhat.com/ubi8/ubi:latest" $CURRENT_DIR
       fi
-	docker run -v $PWD:/root -it --rm rpm_module_r8:$script_version
+    fi
+    # Run the Docker and mount local directory onto the container
+    docker run -v $PWD:/root -it --rm rpm_module_r8:$script_version
     grype dir:./packages-download --distro rhel:8 -o table > vulnerablity_scan.log
     ;;
   
   9)
    
     echo "Performing action R9"
-    # Check if the 'rpm_module_r9:[version]' image exists and buid it if it does not
-    if ! docker image inspect rpm_module_r9:$script_version > /dev/null 2>&1; then
-      docker build -t rpm_module_r9:$script_version -f $CURRENT_DIR/Dockerfile_r9 $CURRENT_DIR
-    fi
-      echo "docker image exist"
-      # Run the Docker and mount local directory onto the container
-      #If new repo flag was provided, use it in the code
-      if [ -n "$new_repo_input" ]; then
-        echo "User input: $new_repo_input"
-      	docker exec -it rpm_module_r9:$script_version /root/add_repo.sh -url $new_repo_input
+    #check if custom repo flag was provided
+    if [ -n "$new_repo_input" ]; then
+       echo "CUSTOM REPO INSTALLED: $new_repo_input"
+       docker build -t rpm_module_r9:$script_version --build-arg OS_VERSION="registry.access.redhat.com/ubi9-init" --build-arg ARG_REPO=$new_repo_input $CURRENT_DIR
+    else
+      # Check if the 'rpm_module_r9:[version]' image exists and buid it if it does not
+      if ! docker image inspect rpm_module_r9:$script_version > /dev/null 2>&1; then
+        docker build -t rpm_module_r9:$script_version --build-arg OS_VERSION="registry.access.redhat.com/ubi9-init" $CURRENT_DIR
       fi
-      	docker run -v $PWD:/root -it --rm rpm_module_r9:$script_version
+    fi
+    # Run the Docker and mount local directory onto the container
+    docker run -v $PWD:/root -it --rm rpm_module_r9:$script_version
     grype dir:./packages-download --distro rhel:9 -o table > vulnerablity_scan.log
     ;;
 
   *)
     ;;
-esac
-  
+esac 

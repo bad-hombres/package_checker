@@ -1,0 +1,15 @@
+ARG OS_VERSION
+
+From $OS_VERSION
+
+ARG ARG_REPO
+ENV CUSTOM_REPO=$ARG_REPO
+
+WORKDIR /root
+
+#update image and install python3 epel
+RUN yum -y update && yum install -y python3 epel-release
+
+# install custom repository
+#run the download script
+ENTRYPOINT ["/bin/sh", "-c", "python3 ./add_repo.py -url $CUSTOM_REPO && python3 ./rpm_download.py"]

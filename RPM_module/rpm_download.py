@@ -34,14 +34,16 @@ def main():
                 log.write("\n")
 
         print("Packages downloaded successfully to:", download_directory)
+        cleanup_download_dir(download_directory)
 
     except subprocess.CalledProcessError as e:
         print("Error executing command:")
         print(e)
 
-def download_package(package_name, download_directory):
+def download_package(package_name, download_directory): 
+    specific_package_directory  = download_directory + "/" + package_name
     # Construct the yum command to download the package
-    yum_command = ["yum", "-y", "install", "--downloadonly", "--downloaddir", download_directory, package_name]
+    yum_command = ["yum", "-y", "install", "--downloadonly", "--downloaddir", specific_package_directory, package_name]
 
     # Execute the yum command using subprocess
     process = subprocess.Popen(yum_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -52,6 +54,17 @@ def download_package(package_name, download_directory):
     else:
         error_message = stderr.decode('utf-8').strip() if stderr else "Unknown error"
         return False, f"Download failed for '{package_name}': {error_message}"
+
+
+
+# Go throught the files in download directory and delete the empty ones. this is because yum creates directory even if the download is unsuccessful
+def cleanup_download_dir(directory):
+    for dirpath, dirnames, filenames in os.walk(directory, topdown=False):
+        for dirname in dirnames:
+            dir_to_check = os.path.join(dirpath, dirname)
+            if not os.listdir(dir_to_check):
+                os.rmdir(dir_to_check)
+                print(f"Deleted empty directory: {dir_to_check}")
 
 if __name__ == "__main__":
     main()
