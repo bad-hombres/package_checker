@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #script version, update each time you release change to dockerfile
-script_version="0.2"
+script_version="0.3"
 
 
 # Check if Docker is installed
@@ -61,6 +61,18 @@ if [ -z "$r_option" ]; then
   usage
 fi
 
+#check if -u flag is a valid url
+url_pattern="^https?://.*\..*/.*\.repo"
+
+if [ -n "$new_repo_input" ]; then
+  if [[ $new_repo_input =~ $url_pattern ]]; then
+    echo "The new repository flag matches the regex pattern."
+  else
+	  echo "The new reposirtory (-u flag) input did not match expected pattern, it needs to be URL to .repo file"
+    exit
+  fi
+fi
+
 # Shift to the next argument after the options
 shift $((OPTIND-1))
 
@@ -72,7 +84,7 @@ case "$r_option" in
     #check if custom repo flag was provided
     if [ -n "$new_repo_input" ]; then
        echo "CUSTOM REPO INSTALLED: $new_repo_input"
-       docker build -t rpm_module_r7:$script_version --build-arg OS_VERSION="centos:7" --build-arg ARG_REPO=$new_repo_input $CURRENT_DIR
+       docker build -t rpm_module_r7:$script_version -f Dockerfile_newrepo --build-arg OS_VERSION="centos:7" --build-arg ARG_REPO=$new_repo_input $CURRENT_DIR
     else
       # Check if the 'rpm_module_r7:[version]' image exists and buid it if it does not
       if ! docker image inspect rpm_module_r7:$script_version > /dev/null 2>&1; then
@@ -81,7 +93,6 @@ case "$r_option" in
     fi
     # Run the Docker and mount local directory onto the container
     docker run -v $PWD:/root -it --rm rpm_module_r7:$script_version
-    
     grype dir:./packages-download --distro rhel:7 -o table > vulnerablity_scan.log
     ;;
   
@@ -90,7 +101,7 @@ case "$r_option" in
     #check if custom repo flag was provided
     if [ -n "$new_repo_input" ]; then
        echo "CUSTOM REPO INSTALLED: $new_repo_input"
-       docker build -t rpm_module_r8:$script_version --build-arg OS_VERSION="registry.access.redhat.com/ubi8/ubi:latest" --build-arg ARG_REPO=$new_repo_input $CURRENT_DIR
+       docker build -t rpm_module_r8:$script_version -f Dockerfile_newrepo --build-arg OS_VERSION="registry.access.redhat.com/ubi8/ubi:latest" --build-arg ARG_REPO=$new_repo_input $CURRENT_DIR
     else
       # Check if the 'rpm_module_r8:[version]' image exists and buid it if it does not
       if ! docker image inspect rpm_module_r8:$script_version > /dev/null 2>&1; then
@@ -108,7 +119,7 @@ case "$r_option" in
     #check if custom repo flag was provided
     if [ -n "$new_repo_input" ]; then
        echo "CUSTOM REPO INSTALLED: $new_repo_input"
-       docker build -t rpm_module_r9:$script_version --build-arg OS_VERSION="registry.access.redhat.com/ubi9-init" --build-arg ARG_REPO=$new_repo_input $CURRENT_DIR
+       docker build -t rpm_module_r9:$script_version -f Dockerfile_newrepo --build-arg OS_VERSION="registry.access.redhat.com/ubi9-init" --build-arg ARG_REPO=$new_repo_input $CURRENT_DIR
     else
       # Check if the 'rpm_module_r9:[version]' image exists and buid it if it does not
       if ! docker image inspect rpm_module_r9:$script_version > /dev/null 2>&1; then

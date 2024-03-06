@@ -29,17 +29,20 @@ def install_yum_repository(url):
 
 def main():
     parser = argparse.ArgumentParser(description="Install a YUM repository using a URL.")
-    parser.add_argument('-url', required=True, help="The URL of the YUM repository to install.")
+    parser.add_argument('-url', required=False, help="The URL of the YUM repository to install.")
 
     args = parser.parse_args()
 
     repository_url = args.url
 
-    # Check if yum-utils is installed; if not, install it
-    install_yum_utils()
-
-    # Call the function to install the YUM repository
-    install_yum_repository(repository_url)
+    #check if the url argument was passed
+    if repository_url:
+        # Check if yum-utils is installed; if not, install it
+        install_yum_utils()
+        # Call the function to install the YUM repository
+        install_yum_repository(repository_url)
+    else:
+        exit
 if __name__ == "__main__":
     main()
 

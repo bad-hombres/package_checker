@@ -13,4 +13,4 @@ RUN yum -y update && yum install -y python3
 
 # install custom repository
 #run the download script
-ENTRYPOINT ["/bin/sh", "-c", "python3 ./rpm_download.py"]
+ENTRYPOINT ["/bin/sh", "-c", "python3 ./add_repo.py -url $CUSTOM_REPO && python3 ./rpm_download.py"]
